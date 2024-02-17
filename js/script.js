@@ -1,6 +1,10 @@
 document.querySelector('input[id="name"]').focus();
 document.querySelector('input[id="other-job-role"]').style.display = 'none';
 document.querySelector('select[id="color"]').disabled = true;
+document.querySelector('div[id="paypal"]').style.display = 'none';
+document.querySelector('div[id="bitcoin"]').style.display = 'none';
+document.querySelector('option[value="credit-card"]').selected = true;
+
 
 const selectDesign = document.querySelector('select[id="design"]');
 const jobRole = document.querySelector('select[id="title"]');
@@ -8,6 +12,8 @@ const selectColor = document.querySelector('select[id="color"]');
 const colorOptions = selectColor.querySelectorAll('option[data-theme]');
 const activitiesFieldset = document.querySelector('fieldset[id="activities"]');
 const checkboxesOfActivities = activitiesFieldset.querySelectorAll('input[type="checkbox"]');
+const selectPayment = document.querySelector('select[id="payment"]');
+const creditCardInfo = document.querySelector('div[id="credit-card"]');
 
 
 
@@ -46,4 +52,24 @@ activitiesFieldset.addEventListener('change', () => {
         }  
         //updating text content of Total to new amount
         totalCostElement.textContent = `Total: $${total}`;
+});
+
+
+/*** Event listener to hide payment methods other than selected ***/
+
+selectPayment.addEventListener('change', () => {
+    if (selectPayment.value === 'paypal') {
+        document.querySelector('div[id="paypal"]').style.display = 'block';
+        document.querySelector('div[id="bitcoin"]').style.display = 'none';
+        creditCardInfo.style.display = 'none';
+    } else if (selectPayment.value === 'bitcoin') {
+        document.querySelector('div[id="bitcoin"]').style.display = 'block';
+        document.querySelector('div[id="paypal"]').style.display = 'none';
+        creditCardInfo.style.display = 'none';
+    } else if (selectPayment.value === 'credit-card') {
+        creditCardInfo.style.display = 'block';
+        document.querySelector('div[id="bitcoin"]').style.display = 'none';
+        document.querySelector('div[id="paypal"]').style.display = 'none';        
+    }
+
 });
