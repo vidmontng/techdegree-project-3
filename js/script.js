@@ -6,14 +6,16 @@ document.querySelector('div[id="bitcoin"]').style.display = 'none';
 document.querySelector('option[value="credit-card"]').selected = true;
 
 
-const selectDesign = document.querySelector('select[id="design"]');
 const jobRole = document.querySelector('select[id="title"]');
+const selectDesign = document.querySelector('select[id="design"]');
 const selectColor = document.querySelector('select[id="color"]');
 const colorOptions = selectColor.querySelectorAll('option[data-theme]');
 const activitiesFieldset = document.querySelector('fieldset[id="activities"]');
 const checkboxesOfActivities = activitiesFieldset.querySelectorAll('input[type="checkbox"]');
 const selectPayment = document.querySelector('select[id="payment"]');
 const creditCardInfo = document.querySelector('div[id="credit-card"]');
+const nameInputField = document.querySelector('input[id="name"]');
+const emailInputField = document.querySelector('input[name="user-email"]');
 
 
 
@@ -24,19 +26,32 @@ jobRole.addEventListener('change', e => {
     }
 });
 
-//event listener to reflect only the colors available for the selected t-shirt theme  ****NOT FINISHED****
+
+/***Event listener to reflect only the colors available for the selected t-shirt theme***/
+
 selectDesign.addEventListener('change', e => {
     selectColor.disabled = false;
-    let color = e.target.value;
+    let selectDesign = e.target;
+    let design = selectDesign.value;
+    const colors = Array.from(colorOptions);
+    let currentOptions = [];
     
-    for (let i=0; i<colorOptions.length; i++) {
-        if (color === colorOptions[i].getAttribute('data-theme')) {
-            colorOptions[i].hidden = false;
-        } else if (color !== colorOptions[i].getAttribute('data-theme'))
-            colorOptions[i].hidden = true;
-    }
-});
+    for (let i=0; i<colors.length; i++) {
 
+        let colorOption = colors[i];
+        let colorOptionValue = colors[i].getAttribute('data-theme');
+        
+        if (design === colorOptionValue) {
+            colorOption.hidden = false;
+            // console.log(colorOption);
+            currentOptions.push(colorOption);
+            } else {
+            colorOption.hidden = true;
+            }         
+        }
+        currentOptions[0].selected = 'selected';     
+    
+});
 
 /***Event listener for 'Register For Activities' section***/
 
@@ -72,4 +87,42 @@ selectPayment.addEventListener('change', () => {
         document.querySelector('div[id="paypal"]').style.display = 'none';        
     }
 
+});
+
+
+/*** Validation ***/
+
+function nameValidation (name) {
+    return /^[a-zA-Z]+$/.test(name);
+}
+
+function emailValidation (email) {
+    return /^[^@]+@[^@.]+\.[a-z]+$/i.test(email);
+}
+
+
+
+
+
+nameInputField.addEventListener('keyup', () => {
+    
+    const nameError = document.querySelector('span[id="name-hint"]');
+    if (!nameValidation(nameInputField.value) && nameInputField.value!=='') {        
+        nameError.style.display = 'block';
+        nameError.textContent = 'Must contain only letters';
+    } else if (nameValidation()) {
+        nameError.style.display = 'none';
+    }
+});
+
+
+emailInputField.addEventListener('keyup', (e) => {
+    const userEmail = e.target.value;
+    const emailError = document.querySelector('span[id="email-hint"]');
+    if (!emailValidation(userEmail) && userEmail!=='') {        
+        emailError.style.display = 'block';
+        
+    } else if (emailValidation(userEmail)) {
+        emailError.style.display = 'none';
+    }
 });
