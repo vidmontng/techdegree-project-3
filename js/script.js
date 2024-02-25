@@ -14,8 +14,8 @@ const activitiesFieldset = document.querySelector('fieldset[id="activities"]');
 const checkboxesOfActivities = activitiesFieldset.querySelectorAll('input[type="checkbox"]');
 const selectPayment = document.querySelector('select[id="payment"]');
 const creditCardInfo = document.querySelector('div[id="credit-card"]');
-const nameInputField = document.querySelector('input[id="name"]');
-const emailInputField = document.querySelector('input[name="user-email"]');
+const nameInputField = document.querySelector('#name');
+const emailInputField = document.querySelector('#email');
 
 
 
@@ -90,39 +90,44 @@ selectPayment.addEventListener('change', () => {
 });
 
 
-/*** Validation ***/
+/**************** Form Validation *****************/
 
-function nameValidation (name) {
-    return /^[a-zA-Z]+$/.test(name);
+function nameValidation () {
+    return /^[a-zA-Z]+$/.test(nameInputField.value);
 }
 
-function emailValidation (email) {
-    return /^[^@]+@[^@.]+\.[a-z]+$/i.test(email);
+function emailValidation () {
+    return /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailInputField.value);
 }
-
-
-
-
 
 nameInputField.addEventListener('keyup', () => {
     
-    const nameError = document.querySelector('span[id="name-hint"]');
-    if (!nameValidation(nameInputField.value) && nameInputField.value!=='') {        
+    const nameError = document.querySelector('#name-hint');
+    
+    if (!nameValidation() && nameInputField.value!=='') {        
         nameError.style.display = 'block';
-        nameError.textContent = 'Must contain only letters';
-    } else if (nameValidation()) {
+        nameError.textContent = 'Name must contain only letters';
+    } else if (nameValidation() || nameInputField.value ==='') {
         nameError.style.display = 'none';
     }
 });
 
 
 emailInputField.addEventListener('keyup', (e) => {
-    const userEmail = e.target.value;
+
+    const verification = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailInputField.value);
     const emailError = document.querySelector('span[id="email-hint"]');
-    if (!emailValidation(userEmail) && userEmail!=='') {        
+
+    if (!verification && emailInputField.value!=='') {        
         emailError.style.display = 'block';
         
-    } else if (emailValidation(userEmail)) {
+    } else if (verification || emailInputField.value ==='') {
         emailError.style.display = 'none';
     }
 });
+
+
+
+
+
+
