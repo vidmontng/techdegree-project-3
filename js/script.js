@@ -1,21 +1,36 @@
-document.querySelector('input[id="name"]').focus();
-document.querySelector('input[id="other-job-role"]').style.display = 'none';
-document.querySelector('select[id="color"]').disabled = true;
-document.querySelector('div[id="paypal"]').style.display = 'none';
-document.querySelector('div[id="bitcoin"]').style.display = 'none';
-document.querySelector('option[value="credit-card"]').selected = true;
+/*** Declaring all variables ***/
+const   jobRole = document.querySelector('#title'),
+        otherJobRole = document.querySelector('#other-job-role'),
+        selectDesign = document.querySelector('#design'),
+        selectColor = document.querySelector('#color'),
+        colorOptions = selectColor.querySelectorAll('option[data-theme]'),
+        activitiesFieldset = document.querySelector('#activities'),
+        checkboxesOfActivities = activitiesFieldset.querySelectorAll('input[type="checkbox"]'),
+        selectPayment = document.querySelector('#payment'),
+        payPal = document.querySelector('#paypal'),
+        bitcoin = document.querySelector('#bitcoin'),
+        creditCardInfo = document.querySelector('#credit-card'),
+        creditCardOption =document.querySelector('option[value="credit-card"]'),
+        nameInputField = document.querySelector('#name'),
+        emailInputField = document.querySelector('#email'),
+        ccNumberInput = document.querySelector('#cc-num'),
+        zipInput = document.querySelector('#zip'),
+        cvvInput = document.querySelector('#cvv'),
+        nameError = document.querySelector('#name-hint'),
+        emailError = document.querySelector('#email-hint'),
+        creditCardError = document.querySelector('#cc-hint'),
+        zipError = document.querySelector('#zip-hint'),
+        cvvError = document.querySelector('#cvv-hint');
+        
 
+/*** Default states for elements on page load ***/
+nameInputField.focus();
+otherJobRole.style.display = 'none';
+selectColor.disabled = true;
+payPal.style.display = 'none';
+bitcoin.style.display = 'none';
+creditCardOption.selected = true;
 
-const jobRole = document.querySelector('select[id="title"]');
-const selectDesign = document.querySelector('select[id="design"]');
-const selectColor = document.querySelector('select[id="color"]');
-const colorOptions = selectColor.querySelectorAll('option[data-theme]');
-const activitiesFieldset = document.querySelector('fieldset[id="activities"]');
-const checkboxesOfActivities = activitiesFieldset.querySelectorAll('input[type="checkbox"]');
-const selectPayment = document.querySelector('select[id="payment"]');
-const creditCardInfo = document.querySelector('div[id="credit-card"]');
-const nameInputField = document.querySelector('#name');
-const emailInputField = document.querySelector('#email');
 
 
 
@@ -33,7 +48,7 @@ selectDesign.addEventListener('change', e => {
     selectColor.disabled = false;
     let selectDesign = e.target;
     let design = selectDesign.value;
-    const colors = Array.from(colorOptions);
+     colors = Array.from(colorOptions);
     let currentOptions = [];
     
     for (let i=0; i<colors.length; i++) {
@@ -89,45 +104,50 @@ selectPayment.addEventListener('change', () => {
 
 });
 
-
+/**************************************************/
 /**************** Form Validation *****************/
+/**************************************************/
 
-function nameValidation () {
-    return /^[a-zA-Z]+$/.test(nameInputField.value);
+
+/*** Declared variables for validation part of the project. 
+ * SOme variables at the bottom are assigned new text content and some assigned text content that was already assigned in the HTML. 
+ * It was done because the function that creates event objects for listeners has the same format for all input fields, 
+ * but need different error messages for different errors. Some of them match the text already assigned to them in HTML, some - don't. ***/
+const   regexName = /^[a-zA-Z]+$/,
+        regexEmail = /^[^@]+@[^@.]+\.[a-z]+$/i,
+        regexCreditCard = /^[\d]{13,16}$/,
+        regexZipCode = /^[\d]{5}$/,
+        regexCVV = /^[\d]{3}$/,
+        nameErrorMsg = `Name can only contain letters`,
+        emailErrorMsg = emailError.textContent,
+        ccErrorMsg = creditCardError.textContent,
+        zipCodeError = zipError.textContent,
+        cvvErrorMsg = cvvError.textContent;
+
+//this function will validate all input fields
+function validator (value, regex) {
+    return regex.test(value);
 }
 
-function emailValidation () {
-    return /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailInputField.value);
+
+//created closure - function that will return event objects for event listeners for all input fields
+function eventListener (inputField, regex, errorMsg, errorText) {
+    return e => {
+        const text = inputField.value;
+        const validation = validator (text, regex);
+
+        if (!validation && text!=='') {
+            errorMsg.style.display = 'block';
+            errorMsg.textContent = errorText;
+        } else if (validation || text ===''){
+            errorMsg.style.display = 'none';
+        }  
+    }
 }
 
-nameInputField.addEventListener('keyup', () => {
-    
-    const nameError = document.querySelector('#name-hint');
-    
-    if (!nameValidation() && nameInputField.value!=='') {        
-        nameError.style.display = 'block';
-        nameError.textContent = 'Name must contain only letters';
-    } else if (nameValidation() || nameInputField.value ==='') {
-        nameError.style.display = 'none';
-    }
-});
-
-
-emailInputField.addEventListener('keyup', (e) => {
-
-    const verification = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailInputField.value);
-    const emailError = document.querySelector('span[id="email-hint"]');
-
-    if (!verification && emailInputField.value!=='') {        
-        emailError.style.display = 'block';
-        
-    } else if (verification || emailInputField.value ==='') {
-        emailError.style.display = 'none';
-    }
-});
-
-
-
-
-
-
+//event listeners for all input fields
+nameInputField.addEventListener('keyup', eventListener(nameInputField, regexName, nameError, nameErrorMsg));
+emailInputField.addEventListener('keyup', eventListener(emailInputField, regexEmail, emailError, emailErrorMsg));
+ccNumberInput.addEventListener('keyup', eventListener(ccNumberInput, regexCreditCard, creditCardError, ccErrorMsg));
+zipInput.addEventListener('keyup', eventListener(zipInput, regexZipCode, zipError, zipCodeError));
+cvvInput.addEventListener('keyup', eventListener(cvvInput, regexCVV, cvvError));
