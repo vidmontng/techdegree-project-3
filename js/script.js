@@ -1,5 +1,7 @@
 /*** Declaring all variables ***/
-const   jobRole = document.querySelector('#title'),
+const   form = document.querySelector('form'),
+        // nameInputLabel = document.querySelector('label[for="name"]'),
+        jobRole = document.querySelector('#title'),
         otherJobRole = document.querySelector('#other-job-role'),
         selectDesign = document.querySelector('#design'),
         selectColor = document.querySelector('#color'),
@@ -18,9 +20,15 @@ const   jobRole = document.querySelector('#title'),
         cvvInput = document.querySelector('#cvv'),
         nameError = document.querySelector('#name-hint'),
         emailError = document.querySelector('#email-hint'),
+        activitiesError = document.querySelector('#activities-hint'),
         creditCardError = document.querySelector('#cc-hint'),
         zipError = document.querySelector('#zip-hint'),
-        cvvError = document.querySelector('#cvv-hint');
+        cvvError = document.querySelector('#cvv-hint'),
+        activityCheckboxes = activitiesFieldset.querySelectorAll('input');
+               
+
+         
+
         
 
 /*** Default states for elements on page load ***/
@@ -34,7 +42,29 @@ creditCardOption.selected = true;
 
 
 
-//event listener to hide/reveal "other job" field 
+/*** Adding visible focus/blur states to the activities ***/
+
+activityCheckboxes.forEach((activity) => { 
+    activity.addEventListener('focus', (e) => {
+        const label = e.target.parentNode;
+        label.className = 'focus';
+    }
+    )
+});
+
+activityCheckboxes.forEach((activity) => { 
+    activity.addEventListener('blur', (e) => {
+        const label = e.target.parentNode;
+        label.className = 'blur';
+    }
+    )
+});
+
+
+
+
+/***Event listener to hide/reveal "other job" field ***/
+
 jobRole.addEventListener('change', e => {
     if (e.target.value === "other") {
         document.querySelector('input[id="other-job-role"]').style.display = 'inline-block';
@@ -72,16 +102,19 @@ selectDesign.addEventListener('change', e => {
 
 activitiesFieldset.addEventListener('change', () => {
     //selecting the element that will reflect the total price of all chosen activities
-   let totalCostElement = activitiesFieldset.querySelector('p[id="activities-cost"]');   
+   let totalCostElement = activitiesFieldset.querySelector('#activities-cost');   
    let total = 0;
         //looping through every checkbox to check if the activity was checked by a user
         for (let i=0; i<checkboxesOfActivities.length; i++) {
             if (checkboxesOfActivities[i].checked) {
                 total +=parseInt(checkboxesOfActivities[i].getAttribute('data-cost'));
+                totalCostElement.textContent = `Total: $${total}`;
             } 
         }  
         //updating text content of Total to new amount
-        totalCostElement.textContent = `Total: $${total}`;
+        
+
+
 });
 
 
@@ -110,7 +143,7 @@ selectPayment.addEventListener('change', () => {
 
 
 /*** Declared variables for validation part of the project. 
- * SOme variables at the bottom are assigned new text content and some assigned text content that was already assigned in the HTML. 
+ * Some variables at the bottom are assigned new text content and some assigned text content that was already assigned in the HTML. 
  * It was done because the function that creates event objects for listeners has the same format for all input fields, 
  * but need different error messages for different errors. Some of them match the text already assigned to them in HTML, some - don't. ***/
 const   regexName = /^[a-zA-Z]+$/,
@@ -118,36 +151,100 @@ const   regexName = /^[a-zA-Z]+$/,
         regexCreditCard = /^[\d]{13,16}$/,
         regexZipCode = /^[\d]{5}$/,
         regexCVV = /^[\d]{3}$/,
-        nameErrorMsg = `Name can only contain letters`,
-        emailErrorMsg = emailError.textContent,
-        ccErrorMsg = creditCardError.textContent,
-        zipCodeError = zipError.textContent,
-        cvvErrorMsg = cvvError.textContent;
+        invalidName = `Name can only contain letters`,
+        invalidEmail = emailError.textContent,
+        invalidCC = creditCardError.textContent,
+        invalidZip = zipError.textContent,
+        invalidCVV = cvvError.textContent,
+        emptyName = nameError.textContent,
+        emptyEmail = `Email field cannot be blank`,
+        emptyCC = `Credit Card field cannot be blank`,
+        emptyZip = `Zip Code cannot be blank`,
+        emptyCVV = `CVV field cannot be blank`;
 
-//this function will validate all input fields
-function validator (value, regex) {
-    return regex.test(value);
+
+function textInputValidator (inputField, regex) {
+    
+    const input = inputField.value;
+    const validation = regex.test(input);
+    
+    if (validation) {
+        return 'valid input';
+    } else if (input==="") {
+        return 'empty input';
+    } else if (!validation && input!=="") {
+        return 'invalid input';
+    }
+
 }
 
 
 //created closure - function that will return event objects for event listeners for all input fields
-function eventListener (inputField, regex, errorMsg, errorText) {
+function showCustomError (inputField, regex, tooltip, emptyFieldError, invalidInputError) {
     return e => {
-        const text = inputField.value;
-        const validation = validator (text, regex);
-
-        if (!validation && text!=='') {
-            errorMsg.style.display = 'block';
-            errorMsg.textContent = errorText;
-        } else if (validation || text ===''){
-            errorMsg.style.display = 'none';
-        }  
+        
+        
+        if (textInputValidator(inputField, regex) === 'valid input') {
+            tooltip.style.display = 'none';
+            
+        } else if (textInputValidator(inputField, regex) === 'empty input') {
+            tooltip.style.display = 'block';
+            tooltip.textContent = emptyFieldError;
+            
+        } else if (textInputValidator(inputField, regex) === 'invalid input') {
+            tooltip.style.display = 'block';
+            tooltip.textContent = invalidInputError;
+        }
     }
 }
 
+//validator for Activities section, or checkbox validator
+// activitiesFieldset.addEventListener('change', (e) => {
+
+
+
+// });
+
+
 //event listeners for all input fields
-nameInputField.addEventListener('keyup', eventListener(nameInputField, regexName, nameError, nameErrorMsg));
-emailInputField.addEventListener('keyup', eventListener(emailInputField, regexEmail, emailError, emailErrorMsg));
-ccNumberInput.addEventListener('keyup', eventListener(ccNumberInput, regexCreditCard, creditCardError, ccErrorMsg));
-zipInput.addEventListener('keyup', eventListener(zipInput, regexZipCode, zipError, zipCodeError));
-cvvInput.addEventListener('keyup', eventListener(cvvInput, regexCVV, cvvError));
+nameInputField.addEventListener('input', showCustomError(nameInputField, regexName, nameError, emptyName, invalidName));
+emailInputField.addEventListener('input', showCustomError(emailInputField, regexEmail, emailError, emptyEmail, invalidEmail));
+ccNumberInput.addEventListener('input', showCustomError(ccNumberInput, regexCreditCard, creditCardError, emptyCC, invalidCC));
+zipInput.addEventListener('input', showCustomError(zipInput, regexZipCode, zipError, emptyZip, invalidZip));
+cvvInput.addEventListener('input', showCustomError(cvvInput, regexCVV, cvvError, emptyCVV, invalidCVV));
+
+
+
+
+
+
+// form.addEventListener('submit', (e) => {
+    
+//     if (!validator(nameInputField, regexName)) {
+//         e.preventDefault();
+        
+//     }
+//     // || !validator(emailInputField, regexEmail) 
+//     // ||  !validator(ccNumberInput, regexCreditCard) 
+//     // || !validator(zipInput, regexZipCode) || 
+//     //     !validator(cvvInput, regexCVV))    
+//     {
+
+//         nameInputField.parentNode.className = 'not-valid';
+//         nameError.style.display = 'block';
+//     } else if (!validator(emailInputField, regexEmail)) {
+//         emailInputField.parentNode.className = 'not-valid';
+//         emailError.style.display = 'block';
+//     }
+// });
+
+
+
+
+
+
+
+
+
+
+
