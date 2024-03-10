@@ -7,7 +7,7 @@ const   form = document.querySelector('form'),
         selectColor = document.querySelector('#color'),
         colorOptions = selectColor.querySelectorAll('option[data-theme]'),
         activitiesFieldset = document.querySelector('#activities'),
-        checkboxesOfActivities = activitiesFieldset.querySelectorAll('input[type="checkbox"]'),
+        checkboxesOfActivities = activitiesFieldset.querySelectorAll('input'),
         selectPayment = document.querySelector('#payment'),
         payPal = document.querySelector('#paypal'),
         bitcoin = document.querySelector('#bitcoin'),
@@ -23,8 +23,7 @@ const   form = document.querySelector('form'),
         activitiesError = document.querySelector('#activities-hint'),
         creditCardError = document.querySelector('#cc-hint'),
         zipError = document.querySelector('#zip-hint'),
-        cvvError = document.querySelector('#cvv-hint'),
-        activityCheckboxes = activitiesFieldset.querySelectorAll('input');
+        cvvError = document.querySelector('#cvv-hint');
                
 
          
@@ -44,7 +43,7 @@ creditCardOption.selected = true;
 
 /*** Adding visible focus/blur states to the activities ***/
 
-activityCheckboxes.forEach((activity) => { 
+checkboxesOfActivities.forEach((activity) => { 
     activity.addEventListener('focus', (e) => {
         const label = e.target.parentNode;
         label.className = 'focus';
@@ -52,13 +51,25 @@ activityCheckboxes.forEach((activity) => {
     )
 });
 
-activityCheckboxes.forEach((activity) => { 
+checkboxesOfActivities.forEach((activity) => { 
     activity.addEventListener('blur', (e) => {
         const label = e.target.parentNode;
         label.className = 'blur';
     }
     )
 });
+
+// checkboxesOfActivities.forEach((activity) => { 
+//     activity.addEventListener('change', (e) => {
+//         const label = e.target.parentNode;
+//         if (activity.checked) {
+//         label.className = 'focus';
+//         } else if(!activity.checked) {
+//          label.className = 'blur';
+//         }
+//     }
+//     )
+
 
 
 
@@ -97,25 +108,48 @@ selectDesign.addEventListener('change', e => {
         currentOptions[0].selected = 'selected';     
     
 });
-
+/**********************************************************/
 /***Event listener for 'Register For Activities' section***/
+/***It listenesfor a "change" event and calculates the total cost of chosen activities AND 
+ * disables activities with the same time period to  prevent users from selecting activities that occur at the same time. */
+/**********************************************************/
 
-activitiesFieldset.addEventListener('change', () => {
+activitiesFieldset.addEventListener('change', (e) => {
     //selecting the element that will reflect the total price of all chosen activities
-   let totalCostElement = activitiesFieldset.querySelector('#activities-cost');   
-   let total = 0;
-        //looping through every checkbox to check if the activity was checked by a user
-        for (let i=0; i<checkboxesOfActivities.length; i++) {
-            if (checkboxesOfActivities[i].checked) {
-                total +=parseInt(checkboxesOfActivities[i].getAttribute('data-cost'));
-                totalCostElement.textContent = `Total: $${total}`;
-            } 
-        }  
-        //updating text content of Total to new amount
+        let totalCostElement = activitiesFieldset.querySelector('#activities-cost');  
         
+        const activity = e.target;
+        const activityTime = activity.getAttribute('data-day-and-time');
+        const sameTime = [];
+        let total = 0;
 
+            for (let i=0; i<checkboxesOfActivities.length; i++) {
+                const newActivity = checkboxesOfActivities[i];  
+                const checked = newActivity.checked;
+                const newActivityTime = newActivity.getAttribute('data-day-and-time');
+                const newActivityCost = newActivity.getAttribute('data-cost');
+                //  = activity.getAttribute('data-day-and-time');
 
+                if (checked) {
+                    total += parseInt(newActivityCost);
+                }
+
+                if (newActivity!==e.target && newActivityTime === activityTime) {                    
+                    sameTime.push(newActivity);
+                } 
+
+                sameTime.forEach(sameTimeActivity => {
+                    sameTimeActivity.disabled = true;
+                    sameTimeActivity.parentElement.className = 'disabled';
+                });
+                          
+            //updating text content of Total to new amount
+            totalCostElement.textContent = `Total: $${total}`;
+            }
 });
+
+
+
 
 
 /*** Event listener to hide payment methods other than selected ***/
@@ -237,14 +271,4 @@ cvvInput.addEventListener('input', showCustomError(cvvInput, regexCVV, cvvError,
 //         emailError.style.display = 'block';
 //     }
 // });
-
-
-
-
-
-
-
-
-
-
 
