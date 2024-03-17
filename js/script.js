@@ -1,15 +1,17 @@
-/*** Declaring all variables ***/
+/*** Selected all form elements that will be needed for the project ***/
 const   form = document.querySelector('form'),
-        // nameInputLabel = document.querySelector('label[for="name"]'),
         jobRole = document.querySelector('#title'),
+        otherJobRoleOption = document.querySelector('input[value="other"]'),
         otherJobRole = document.querySelector('#other-job-role'),
         selectDesign = document.querySelector('#design'),
         selectColor = document.querySelector('#color'),
         colorOptions = selectColor.querySelectorAll('option[data-theme]'),
         activitiesFieldset = document.querySelector('#activities'),
+        activities = document.querySelector('#activities-box'),
+        totalCostElement = activitiesFieldset.querySelector('#activities-cost'),
         checkboxesOfActivities = activitiesFieldset.querySelectorAll('input'),
         selectPayment = document.querySelector('#payment'),
-        payPal = document.querySelector('#paypal'),
+        paypal = document.querySelector('#paypal'),
         bitcoin = document.querySelector('#bitcoin'),
         creditCardInfo = document.querySelector('#credit-card'),
         creditCardOption =document.querySelector('option[value="credit-card"]'),
@@ -24,64 +26,42 @@ const   form = document.querySelector('form'),
         creditCardError = document.querySelector('#cc-hint'),
         zipError = document.querySelector('#zip-hint'),
         cvvError = document.querySelector('#cvv-hint');
-               
 
-         
+       
 
-        
-
-/*** Default states for elements on page load ***/
+/***Setting up default states for elements on page load ***/
 nameInputField.focus();
 otherJobRole.style.display = 'none';
 selectColor.disabled = true;
-payPal.style.display = 'none';
+paypal.style.display = 'none';
 bitcoin.style.display = 'none';
 creditCardOption.selected = true;
 
 
-
-
 /*** Adding visible focus/blur states to the activities ***/
-
-checkboxesOfActivities.forEach((activity) => { 
-    activity.addEventListener('focus', (e) => {
+//created a closeure that returns event object
+function activeBlur (state) {
+    return e => {
         const label = e.target.parentNode;
-        label.className = 'focus';
+        label.className = state;
     }
-    )
-});
+}
 
+//event listener that accepts activeBlur() closure function
 checkboxesOfActivities.forEach((activity) => { 
-    activity.addEventListener('blur', (e) => {
-        const label = e.target.parentNode;
-        label.className = 'blur';
-    }
-    )
+    activity.addEventListener('focus', activeBlur('focus'));
+    activity.addEventListener('blur',  activeBlur('blur'));
 });
-
-// checkboxesOfActivities.forEach((activity) => { 
-//     activity.addEventListener('change', (e) => {
-//         const label = e.target.parentNode;
-//         if (activity.checked) {
-//         label.className = 'focus';
-//         } else if(!activity.checked) {
-//          label.className = 'blur';
-//         }
-//     }
-//     )
-
-
 
 
 
 /***Event listener to hide/reveal "other job" field ***/
 
 jobRole.addEventListener('change', e => {
-    if (e.target.value === "other") {
-        document.querySelector('input[id="other-job-role"]').style.display = 'inline-block';
+    if (title.value === 'other') {
+        otherJobRole.style.display = 'block';
     }
 });
-
 
 /***Event listener to reflect only the colors available for the selected t-shirt theme***/
 
@@ -89,25 +69,22 @@ selectDesign.addEventListener('change', e => {
     selectColor.disabled = false;
     let selectDesign = e.target;
     let design = selectDesign.value;
-     colors = Array.from(colorOptions);
+    colors = Array.from(colorOptions);
     let currentOptions = [];
-    
-    for (let i=0; i<colors.length; i++) {
 
+    for (let i=0; i<colors.length; i++) {
         let colorOption = colors[i];
-        let colorOptionValue = colors[i].getAttribute('data-theme');
+        let colorValue = colors[i].getAttribute('data-theme');
         
-        if (design === colorOptionValue) {
+        if (design === colorValue) {
             colorOption.hidden = false;
-            // console.log(colorOption);
             currentOptions.push(colorOption);
             } else {
-            colorOption.hidden = true;
+                colorOption.hidden = true;
             }         
-        }
-        currentOptions[0].selected = 'selected';     
-    
+    } currentOptions[0].selected = 'selected';
 });
+
 /**********************************************************/
 /***Event listener for 'Register For Activities' section***/
 /***It listenesfor a "change" event and calculates the total cost of chosen activities AND 
@@ -116,8 +93,6 @@ selectDesign.addEventListener('change', e => {
 
 activitiesFieldset.addEventListener('change', (e) => {
     //selecting the element that will reflect the total price of all chosen activities
-        let totalCostElement = activitiesFieldset.querySelector('#activities-cost');  
-        
         const activity = e.target;
         const activityTime = activity.getAttribute('data-day-and-time');
         const sameTime = [];
@@ -128,8 +103,7 @@ activitiesFieldset.addEventListener('change', (e) => {
                 const checked = newActivity.checked;
                 const newActivityTime = newActivity.getAttribute('data-day-and-time');
                 const newActivityCost = newActivity.getAttribute('data-cost');
-                //  = activity.getAttribute('data-day-and-time');
-
+                
                 if (checked) {
                     total += parseInt(newActivityCost);
                 }
@@ -149,24 +123,21 @@ activitiesFieldset.addEventListener('change', (e) => {
 });
 
 
-
-
-
 /*** Event listener to hide payment methods other than selected ***/
 
 selectPayment.addEventListener('change', () => {
     if (selectPayment.value === 'paypal') {
-        document.querySelector('div[id="paypal"]').style.display = 'block';
-        document.querySelector('div[id="bitcoin"]').style.display = 'none';
+        paypal.style.display = 'block';
+        bitcoin.style.display = 'none';
         creditCardInfo.style.display = 'none';
     } else if (selectPayment.value === 'bitcoin') {
-        document.querySelector('div[id="bitcoin"]').style.display = 'block';
-        document.querySelector('div[id="paypal"]').style.display = 'none';
+        bitcoin.style.display = 'block';
+        paypal.style.display = 'none';
         creditCardInfo.style.display = 'none';
     } else if (selectPayment.value === 'credit-card') {
         creditCardInfo.style.display = 'block';
-        document.querySelector('div[id="bitcoin"]').style.display = 'none';
-        document.querySelector('div[id="paypal"]').style.display = 'none';        
+        bitcoin.style.display = 'none';
+        paypal.style.display = 'none';        
     }
 
 });
@@ -176,10 +147,40 @@ selectPayment.addEventListener('change', () => {
 /**************************************************/
 
 
+/**************Checkbox validator*****************/
+/*****Checks if at least one of the activities was checked.***/
+
+function validationOfActivities() {
+    let counter = 0;
+    checkboxesOfActivities.forEach(activity => {
+        const checkedCheckboxes =[];
+        const checked = activity.checked;
+
+        if (checked) {
+            checkedCheckboxes.push(checkbox); 
+            counter+=checkedCheckboxes.length; 
+        }   
+        if (counter === 0) {
+            return false;
+        }
+         else if (counter > 0) {
+            activitiesFieldset.className = 'valid';
+
+            return true;
+        }
+    })
+};
+
+
+
+/***********Text input validation**************** */
 /*** Declared variables for validation part of the project. 
- * Some variables at the bottom are assigned new text content and some assigned text content that was already assigned in the HTML. 
- * It was done because the function that creates event objects for listeners has the same format for all input fields, 
- * but need different error messages for different errors. Some of them match the text already assigned to them in HTML, some - don't. ***/
+ * Some variables are assigned new text content and some assigned text content from HTML code. 
+ * It was done because we needed to create custome error messages depending on whether the input field was left empty 
+ * or was incorrect. For example, name field has a default error message "Name field cannot be blank"(empty input error),
+ * but email field has "Email address must be formatted correctly". Since we're not allowed to change HTML code, I assigned
+ * new text content to some input fields.  
+ * ***/
 const   regexName = /^[a-zA-Z]+$/,
         regexEmail = /^[^@]+@[^@.]+\.[a-z]+$/i,
         regexCreditCard = /^[\d]{13,16}$/,
@@ -196,79 +197,137 @@ const   regexName = /^[a-zA-Z]+$/,
         emptyZip = `Zip Code cannot be blank`,
         emptyCVV = `CVV field cannot be blank`;
 
+//created a span that will show an error message if submitted form
+//is incorrect or incomplete.
+function createErrorElement (errorText) {
+    const invalidFormError = document.createElement('span');
+    invalidFormError.className = 'invalid-form';
+    invalidFormError.textContent = errorText;
+    invalidFormError.style.fontSize = '20px';
+    invalidFormError.style.color = 'red';
+    invalidFormError.style.marginLeft = '20px';
+    invalidFormError.style.marginBottom = '20px';
+    invalidFormError.style.display = 'none';
 
+    return invalidFormError;
+}
+//1.inserting newly created element above the 'Sumbit' button, this error will be shown
+//  if *any* field is incorrect or left empty.
+//2. Above the 'Activities" section, in case a user didn't check any activities at all. 
+
+document.querySelector('button').insertAdjacentElement("beforebegin", createErrorElement ("Please make sure that the form is filled correctly"));
+activitiesFieldset.querySelector(':first-child').insertAdjacentElement("beforeend", createErrorElement ("Please check at least one activity"));
+
+//assigning both error messages to the variables
+const errorMessagesForActivities = document.querySelectorAll('.invalid-form')[0];
+const errorMessagesForForm = document.querySelectorAll('.invalid-form')[1];
+
+
+
+/*** Created a function that will accept the value of the input
+ * and a regular expression.There are three return values created
+ * to provide a custom error messages****/
+        
 function textInputValidator (inputField, regex) {
     
     const input = inputField.value;
     const validation = regex.test(input);
     
     if (validation) {
-        return 'valid input';
-    } else if (input==="") {
-        return 'empty input';
-    } else if (!validation && input!=="") {
-        return 'invalid input';
+        inputField.parentElement.className = 'valid';
+        return 'validInput';
+    } else if (input === '') {
+        inputField.parentElement.className = 'not-valid';
+        return 'emptyInput';
+    } else if (!validation) {
+        inputField.parentElement.className = 'not-valid';
+        return 'invalidInput';
     }
-
 }
 
 
-//created closure - function that will return event objects for event listeners for all input fields
+
+//showCustomError function will show custom error messages depending
+//on the values returned by textInputValidator function
 function showCustomError (inputField, regex, tooltip, emptyFieldError, invalidInputError) {
-    return e => {
+     
+    if (textInputValidator(inputField, regex) === 'validInput') {
+        tooltip.style.display = 'none';
         
+    } else if (textInputValidator(inputField, regex) === 'emptyInput') {
+        tooltip.style.display = 'block';
+        tooltip.textContent = emptyFieldError;
         
-        if (textInputValidator(inputField, regex) === 'valid input') {
-            tooltip.style.display = 'none';
-            
-        } else if (textInputValidator(inputField, regex) === 'empty input') {
-            tooltip.style.display = 'block';
-            tooltip.textContent = emptyFieldError;
-            
-        } else if (textInputValidator(inputField, regex) === 'invalid input') {
-            tooltip.style.display = 'block';
-            tooltip.textContent = invalidInputError;
-        }
+    } else if (textInputValidator(inputField, regex) === 'invalidInput') {
+        tooltip.style.display = 'block';
+        tooltip.textContent = invalidInputError;
     }
 }
-
-//validator for Activities section, or checkbox validator
-// activitiesFieldset.addEventListener('change', (e) => {
-
-
-
-// });
-
-
-//event listeners for all input fields
-nameInputField.addEventListener('input', showCustomError(nameInputField, regexName, nameError, emptyName, invalidName));
-emailInputField.addEventListener('input', showCustomError(emailInputField, regexEmail, emailError, emptyEmail, invalidEmail));
-ccNumberInput.addEventListener('input', showCustomError(ccNumberInput, regexCreditCard, creditCardError, emptyCC, invalidCC));
-zipInput.addEventListener('input', showCustomError(zipInput, regexZipCode, zipError, emptyZip, invalidZip));
-cvvInput.addEventListener('input', showCustomError(cvvInput, regexCVV, cvvError, emptyCVV, invalidCVV));
-
-
-
-
-
-
-// form.addEventListener('submit', (e) => {
     
-//     if (!validator(nameInputField, regexName)) {
-//         e.preventDefault();
-        
-//     }
-//     // || !validator(emailInputField, regexEmail) 
-//     // ||  !validator(ccNumberInput, regexCreditCard) 
-//     // || !validator(zipInput, regexZipCode) || 
-//     //     !validator(cvvInput, regexCVV))    
-//     {
 
-//         nameInputField.parentNode.className = 'not-valid';
-//         nameError.style.display = 'block';
-//     } else if (!validator(emailInputField, regexEmail)) {
-//         emailInputField.parentNode.className = 'not-valid';
-//         emailError.style.display = 'block';
-//     }
-// });
+/******Event listeners which will run validation and show error messages 
+*"invalid input/empty input" for all text input fields as soon as a user starts typing*******/
+//I chose "input" event instead of the "keyup" for the following reason - since the Name input field
+//is in focus as soon the page loads, it triggers the "keyup" event, and a user would immediately see
+//an "empty field" error before starting to type, which may be annoying. To avoid it, "input" event was chosen, 
+//in this case the errors will only be shown after a user starts typing and *IF* the input is incorrect.
+
+nameInputField.addEventListener('input', (e) => showCustomError(nameInputField, regexName, nameError, emptyName, invalidName));
+emailInputField.addEventListener('input', (e) => showCustomError(emailInputField, regexEmail, emailError, emptyEmail, invalidEmail));
+ccNumberInput.addEventListener('input', (e) => showCustomError(ccNumberInput, regexCreditCard, creditCardError, emptyCC, invalidCC));
+zipInput.addEventListener('input', (e) => showCustomError(zipInput, regexZipCode, zipError, emptyZip, invalidZip));
+cvvInput.addEventListener('input', (e) => showCustomError(cvvInput, regexCVV, cvvError, emptyCVV, invalidCVV));
+
+
+/****Form submition validator*******/
+form.addEventListener('submit', (e) => {
+    e.submitter = document.querySelector('button');
+
+    const name = textInputValidator(nameInputField, regexName);
+    const email = textInputValidator(emailInputField, regexEmail);
+    const creditCard = textInputValidator(ccNumberInput, regexCreditCard);
+    const zip = textInputValidator(zipInput, regexZipCode);
+    const CVV = textInputValidator(cvvInput, regexCVV);
+
+    
+    if (name === 'emptyInput' || name === 'invalidInput') {
+        e.preventDefault();
+        errorMessagesForForm.style.display = 'block';
+        showCustomError(nameInputField, regexName, nameError, emptyName, invalidName);
+    }
+    if (email === 'emptyInput' || email === 'invalidInput') {
+        e.preventDefault();
+        errorMessagesForForm.style.display = 'block';
+        showCustomError(emailInputField, regexEmail, emailError, emptyEmail, invalidEmail);
+    }
+    if (selectPayment.value === 'credit-card'){
+
+            if (creditCard === 'emptyInput' || creditCard === 'invalidInput') {
+                e.preventDefault();
+                errorMessagesForForm.style.display = 'block';  
+                showCustomError(ccNumberInput, regexCreditCard, creditCardError, emptyCC, invalidCC);
+            }
+    
+            if (zip === 'emptyInput' || zip === 'invalidINput') {
+                e.preventDefault();
+                errorMessagesForForm.style.display = 'block';
+                showCustomError(zipInput, regexZipCode, zipError, emptyZip, invalidZip);
+            }
+        
+            if (CVV === 'emptyInput' ||  CVV === 'invalidINput') {
+                e.preventDefault();
+                errorMessagesForForm.style.display = 'block';
+                showCustomError(cvvInput, regexCVV, cvvError, emptyCVV, invalidCVV);
+            }
+    }
+        
+     if (!validationOfActivities()) {
+        e.preventDefault();
+        activitiesFieldset.className = 'not-valid';
+        errorMessagesForForm.style.display = 'block';
+        errorMessagesForActivities.style.display = 'block';
+    } 
+});
+
+
 
