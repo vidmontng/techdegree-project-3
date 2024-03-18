@@ -39,7 +39,6 @@ creditCardOption.selected = true;
 
 
 /*** Adding visible focus/blur states to the activities ***/
-//created a closeure that returns event object
 function activeBlur (state) {
     return e => {
         const label = e.target.parentNode;
@@ -47,16 +46,14 @@ function activeBlur (state) {
     }
 }
 
-//event listener that accepts activeBlur() closure function
+//event listener that accepts activeBlur() function
 checkboxesOfActivities.forEach((activity) => { 
     activity.addEventListener('focus', activeBlur('focus'));
     activity.addEventListener('blur',  activeBlur('blur'));
 });
 
 
-
 /***Event listener to hide/reveal "other job" field ***/
-
 jobRole.addEventListener('change', e => {
     if (title.value === 'other') {
         otherJobRole.style.display = 'block';
