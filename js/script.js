@@ -85,114 +85,6 @@ selectDesign.addEventListener('change', e => {
     } currentOptions[0].selected = 'selected';
 });
 
-/**********************************************************/
-/***Event listener for 'Register For Activities' section***/
-/***It listenesfor a "change" event and calculates the total cost of chosen activities AND 
- * disables activities with the same time period to  prevent users from selecting activities that occur at the same time. */
-/**********************************************************/
-
-activitiesFieldset.addEventListener('change', (e) => {
-    //selecting the element that will reflect the total price of all chosen activities
-        
-    
-
-        for (let i=0; i<checkboxesOfActivities.length; i++) {
-            const activity = e.target;
-            const checked = activity.checked;
-            const activityTime = activity.getAttribute('data-day-and-time');
-            const sameTime = [];
-            let total = 0;
-            const newActivity = checkboxesOfActivities[i];  
-            const newActivityTime = newActivity.getAttribute('data-day-and-time');
-            const newActivityCost = newActivity.getAttribute('data-cost');
-            //  = activity.getAttribute('data-day-and-time');
-
-            if (checked) {
-                total += parseInt(newActivityCost);
-            }
-
-            if (newActivity!==activity && newActivityTime === activityTime) {                    
-                sameTime.push(newActivity);
-            } 
-            if (checked) {
-            sameTime.forEach(sameTimeActivity => {
-                sameTimeActivity.disabled = true;
-                sameTimeActivity.parentElement.classList.add('disabled');
-            });
-        } else {
-            sameTime.forEach(sameTimeActivity => {
-                sameTimeActivity.disabled = false;
-                sameTimeActivity.parentElement.classList.remove('disabled');
-            });
-
-        }
-
-        //updating text content of Total to new amount
-        totalCostElement.textContent = `Total: $${total}`;
-        }
-});
-
-
-
-// const activity = e.target;
-//         const checked = activity.checked;
-//         const activityTime = activity.getAttribute('data-day-and-time');
-//         const sameTime = [];
-//         let total = 0;
-
-//             for (let i=0; i<checkboxesOfActivities.length; i++) {
-//                 const newActivity = checkboxesOfActivities[i];  
-//                 const newActivityTime = newActivity.getAttribute('data-day-and-time');
-//                 const newActivityCost = newActivity.getAttribute('data-cost');
-                
-//                 if (checked) {
-//                     total += parseInt(newActivityCost);
-
-//                     if (newActivity!==activity && newActivityTime === activityTime) {                    
-//                         sameTime.push(newActivity);
-//                     }
-                
-//                 sameTime.forEach(sameTimeActivity => {
-//                     sameTimeActivity.disabled = true;
-//                     sameTimeActivity.parentElement.className = 'disabled';
-//                 });
-//             }
-
-//         }
-                          
-//             //updating text content of Total to new amount
-//             totalCostElement.textContent = `Total: $${total}`;
-
-/**************Checkbox validator*****************/
-/*****Checks if at least one of the activities was checked.***/
-
-function validationOfActivities() {
-    let counter = 0;
-    checkboxesOfActivities.forEach(activity => {
-        const checkedCheckboxes =[];
-        const checked = activity.checked;
-
-        if (checked) {
-            checkedCheckboxes.push(checkedCheckboxes); 
-            counter+=checkedCheckboxes.length; 
-        }   
-        if (counter === 0) {
-            activitiesFieldset.classList.remove('valid');
-            activitiesFieldset.classList.add('not-valid');
-            return false;
-        }
-         else if (counter > 0) {
-            activitiesFieldset.classList.remove('not-valid');
-            activitiesFieldset.classList.add('valid');
-            return true;
-        }
-    })
-};
-
-
- activitiesFieldset.addEventListener('change', () =>  console.log(validationOfActivities()));
-
-
 /*** Event listener to hide payment methods other than selected ***/
 
 selectPayment.addEventListener('change', () => {
@@ -212,12 +104,87 @@ selectPayment.addEventListener('change', () => {
 
 });
 
+
 /**************************************************/
 /**************** Form Validation *****************/
 /**************************************************/
 
 
+/**********************************************************/
+/***Event listener for 'Register For Activities' section***/
+/***It listenes for a "change" event and calculates the total cost of chosen activities AND 
+ * disables activities with the same time period to  prevent users from selecting activities
+ * that occur at the same time. */
+/**********************************************************/
 
+activitiesFieldset.addEventListener('change', (e) => {
+    const activity = e.target;
+    const checked = activity.checked;
+    const activityTime = activity.getAttribute('data-day-and-time');
+    const sameTime = [];
+    let total = 0;
+
+    for (let i=0; i<checkboxesOfActivities.length; i++) {
+        
+        const newActivity = checkboxesOfActivities[i];
+        const newActivityChecked = newActivity.checked;
+        const newActivityTime = newActivity.getAttribute('data-day-and-time');
+        const newActivityCost = newActivity.getAttribute('data-cost');
+
+        if (newActivityChecked) {
+            total += parseInt(newActivityCost);
+        } 
+
+        if (newActivity!==activity && newActivityTime === activityTime) {                    
+            sameTime.push(newActivity);
+        } 
+        if (checked) {
+            sameTime.forEach(sameTimeActivity => {
+                sameTimeActivity.disabled = true;
+                sameTimeActivity.parentElement.classList.add('disabled');
+            });
+        } else {
+        sameTime.forEach(sameTimeActivity => {
+            sameTimeActivity.disabled = false;
+            sameTimeActivity.parentElement.classList.remove('disabled');
+        });
+    } 
+    //updating text content of Total to new amount
+    totalCostElement.textContent = `Total: $${total}`;
+    }
+});
+
+
+/**************Checkbox validator*****************/
+/*****Checks if at least one of the activities was checked.***/
+
+function validationOfActivities() {
+    let counter = 0;
+    checkboxesOfActivities.forEach(activity => {
+        const checkedCheckboxes =[];
+        const checked = activity.checked;
+
+        if (checked) {
+            checkedCheckboxes.push(activity); 
+            counter+=checkedCheckboxes.length; 
+        }   
+        })
+        if (counter === 0) {
+            activitiesFieldset.classList.remove('valid');
+            activitiesFieldset.classList.add('not-valid');
+            
+            return false;
+        }
+         else if (counter > 0) {
+            activitiesFieldset.classList.remove('not-valid');
+            activitiesFieldset.classList.add('valid');
+
+            return true;
+        }
+};
+
+//event listener created for showing an error in real time in case client left "Activities" field unchecked
+ activitiesFieldset.addEventListener('change', () => (validationOfActivities()));
 
 
 /***********Text input validation**************** */
@@ -258,6 +225,7 @@ function createErrorElement (errorText) {
 
     return invalidFormError;
 }
+
 //1.inserting newly created element above the 'Sumbit' button, this error will be shown
 //  if *any* field is incorrect or left empty.
 //2. Above the 'Activities" section, in case a user didn't check any activities at all. 
@@ -291,7 +259,6 @@ function textInputValidator (inputField, regex) {
         return 'invalidInput';
     }
 }
-
 
 
 //showCustomError function will show custom error messages depending
@@ -335,18 +302,28 @@ form.addEventListener('submit', (e) => {
     const creditCard = textInputValidator(ccNumberInput, regexCreditCard);
     const zip = textInputValidator(zipInput, regexZipCode);
     const CVV = textInputValidator(cvvInput, regexCVV);
-
     
+    //if a user didn't check any activities
+    if (!validationOfActivities()) {
+        e.preventDefault();
+        errorMessagesForForm.style.display = 'block';
+        errorMessagesForActivities.style.display = 'block';
+    }
+    
+    //if the Name field was left empty or contains invalid symbols
     if (name === 'emptyInput' || name === 'invalidInput') {
         e.preventDefault();
         errorMessagesForForm.style.display = 'block';
         showCustomError(nameInputField, regexName, nameError, emptyName, invalidName);
     }
+    //if the Email field was left empty or contains invalid symbols
     if (email === 'emptyInput' || email === 'invalidInput') {
         e.preventDefault();
         errorMessagesForForm.style.display = 'block';
         showCustomError(emailInputField, regexEmail, emailError, emptyEmail, invalidEmail);
     }
+    //checks if all fields related to credit card information are filled and correct ONLY IF
+    //credit card  is chosen as a payment option
     if (selectPayment.value === 'credit-card'){
 
             if (creditCard === 'emptyInput' || creditCard === 'invalidInput') {
@@ -367,13 +344,6 @@ form.addEventListener('submit', (e) => {
                 showCustomError(cvvInput, regexCVV, cvvError, emptyCVV, invalidCVV);
             }
     }
-        
-     if (!validationOfActivities()) {
-        e.preventDefault();
-        activitiesFieldset.classList.add('not-valid');
-        errorMessagesForForm.style.display = 'block';
-        errorMessagesForActivities.style.display = 'block';
-    } 
 });
 
 
