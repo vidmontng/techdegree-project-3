@@ -31,7 +31,7 @@ const   form = document.querySelector('form'),
 
 /***Setting up default states for elements on page load ***/
 nameInputField.focus();
-otherJobRole.style.display = 'none';
+otherJobRole.hidden = 'true';
 selectColor.disabled = true;
 paypal.style.display = 'none';
 bitcoin.style.display = 'none';
@@ -54,9 +54,12 @@ checkboxesOfActivities.forEach((activity) => {
 
 
 /***Event listener to hide/reveal "other job" field ***/
-jobRole.addEventListener('change', e => {
-    if (title.value === 'other') {
+jobRole.addEventListener('change', (e) => {
+    const job = e.target;
+    if (job.value === 'other') {
         otherJobRole.style.display = 'block';
+    } else if (job.value !== 'other') {
+        otherJobRole.style.display = 'none';
     }
 });
 
@@ -90,34 +93,104 @@ selectDesign.addEventListener('change', e => {
 
 activitiesFieldset.addEventListener('change', (e) => {
     //selecting the element that will reflect the total price of all chosen activities
-        const activity = e.target;
-        const activityTime = activity.getAttribute('data-day-and-time');
-        const sameTime = [];
-        let total = 0;
+        
+    
 
-            for (let i=0; i<checkboxesOfActivities.length; i++) {
-                const newActivity = checkboxesOfActivities[i];  
-                const checked = newActivity.checked;
-                const newActivityTime = newActivity.getAttribute('data-day-and-time');
-                const newActivityCost = newActivity.getAttribute('data-cost');
-                
-                if (checked) {
-                    total += parseInt(newActivityCost);
-                }
+        for (let i=0; i<checkboxesOfActivities.length; i++) {
+            const activity = e.target;
+            const checked = activity.checked;
+            const activityTime = activity.getAttribute('data-day-and-time');
+            const sameTime = [];
+            let total = 0;
+            const newActivity = checkboxesOfActivities[i];  
+            const newActivityTime = newActivity.getAttribute('data-day-and-time');
+            const newActivityCost = newActivity.getAttribute('data-cost');
+            //  = activity.getAttribute('data-day-and-time');
 
-                if (newActivity!==e.target && newActivityTime === activityTime) {                    
-                    sameTime.push(newActivity);
-                } 
-
-                sameTime.forEach(sameTimeActivity => {
-                    sameTimeActivity.disabled = true;
-                    sameTimeActivity.parentElement.className = 'disabled';
-                });
-                          
-            //updating text content of Total to new amount
-            totalCostElement.textContent = `Total: $${total}`;
+            if (checked) {
+                total += parseInt(newActivityCost);
             }
+
+            if (newActivity!==activity && newActivityTime === activityTime) {                    
+                sameTime.push(newActivity);
+            } 
+            if (checked) {
+            sameTime.forEach(sameTimeActivity => {
+                sameTimeActivity.disabled = true;
+                sameTimeActivity.parentElement.classList.add('disabled');
+            });
+        } else {
+            sameTime.forEach(sameTimeActivity => {
+                sameTimeActivity.disabled = false;
+                sameTimeActivity.parentElement.classList.remove('disabled');
+            });
+
+        }
+
+        //updating text content of Total to new amount
+        totalCostElement.textContent = `Total: $${total}`;
+        }
 });
+
+
+
+// const activity = e.target;
+//         const checked = activity.checked;
+//         const activityTime = activity.getAttribute('data-day-and-time');
+//         const sameTime = [];
+//         let total = 0;
+
+//             for (let i=0; i<checkboxesOfActivities.length; i++) {
+//                 const newActivity = checkboxesOfActivities[i];  
+//                 const newActivityTime = newActivity.getAttribute('data-day-and-time');
+//                 const newActivityCost = newActivity.getAttribute('data-cost');
+                
+//                 if (checked) {
+//                     total += parseInt(newActivityCost);
+
+//                     if (newActivity!==activity && newActivityTime === activityTime) {                    
+//                         sameTime.push(newActivity);
+//                     }
+                
+//                 sameTime.forEach(sameTimeActivity => {
+//                     sameTimeActivity.disabled = true;
+//                     sameTimeActivity.parentElement.className = 'disabled';
+//                 });
+//             }
+
+//         }
+                          
+//             //updating text content of Total to new amount
+//             totalCostElement.textContent = `Total: $${total}`;
+
+/**************Checkbox validator*****************/
+/*****Checks if at least one of the activities was checked.***/
+
+function validationOfActivities() {
+    let counter = 0;
+    checkboxesOfActivities.forEach(activity => {
+        const checkedCheckboxes =[];
+        const checked = activity.checked;
+
+        if (checked) {
+            checkedCheckboxes.push(checkedCheckboxes); 
+            counter+=checkedCheckboxes.length; 
+        }   
+        if (counter === 0) {
+            activitiesFieldset.classList.remove('valid');
+            activitiesFieldset.classList.add('not-valid');
+            return false;
+        }
+         else if (counter > 0) {
+            activitiesFieldset.classList.remove('not-valid');
+            activitiesFieldset.classList.add('valid');
+            return true;
+        }
+    })
+};
+
+
+ activitiesFieldset.addEventListener('change', () =>  console.log(validationOfActivities()));
 
 
 /*** Event listener to hide payment methods other than selected ***/
@@ -144,29 +217,6 @@ selectPayment.addEventListener('change', () => {
 /**************************************************/
 
 
-/**************Checkbox validator*****************/
-/*****Checks if at least one of the activities was checked.***/
-
-function validationOfActivities() {
-    let counter = 0;
-    checkboxesOfActivities.forEach(activity => {
-        const checkedCheckboxes =[];
-        const checked = activity.checked;
-
-        if (checked) {
-            checkedCheckboxes.push(checkbox); 
-            counter+=checkedCheckboxes.length; 
-        }   
-        if (counter === 0) {
-            return false;
-        }
-         else if (counter > 0) {
-            activitiesFieldset.className = 'valid';
-
-            return true;
-        }
-    })
-};
 
 
 
@@ -320,7 +370,7 @@ form.addEventListener('submit', (e) => {
         
      if (!validationOfActivities()) {
         e.preventDefault();
-        activitiesFieldset.className = 'not-valid';
+        activitiesFieldset.classList.add('not-valid');
         errorMessagesForForm.style.display = 'block';
         errorMessagesForActivities.style.display = 'block';
     } 
